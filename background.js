@@ -11,6 +11,11 @@ function isNumeric(num){
   return !isNaN(num)
 }
 
+async function findMenuItems() {
+    const menu_save_found = await chrome.storage.session.get(["menu_save"]);
+    return menu_save_found;
+}
+
 chrome.runtime.onInstalled.addListener(async () => {
     for (const [conversion_id, conversion_type] of Object.entries(conversions)) {
         chrome.contextMenus.create({
@@ -20,43 +25,81 @@ chrome.runtime.onInstalled.addListener(async () => {
             contexts: ["selection"],
         });
         menu_items.push("select" + conversion_id);
-        localStorage.setItem("menu_items", menu_items);
+    }
+    try {
+        await chrome.storage.session.set({ "menu_save" : menu_items });
+        const result = await chrome.storage.session.get(["menu_save"]);
+    } 
+    catch(error) {
+        console.log(error);
     }
 });
 
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
     if (menu_items == undefined || menu_items.length == 0) {
-        menu_items = localStorage.getItem("menu_items");
+        menu_items = findMenuItems().then(function(result) {
+            var menu_save_found = result.menu_save;
+            if (info.menuItemId.includes("select")) {
+                selected_id = menu_save_found.indexOf(info.menuItemId);
+
+                var conversion_desc_values = Object.values(conversions_descriptions);
+                var conversion_values_arr = Object.values(conversion_values);
+
+                units = conversion_desc_values[selected_id];
+
+                value = info.selectionText;
+
+                if (isNumeric(value)) {
+                    converted_value = +value;
+
+                    if (!isNumeric(converted_value)) {
+                        converted_value = "Enter a valid number";
+                    }
+                    else {
+                        converted_value = (converted_value / conversion_values_arr[selected_id]).toFixed(3);
+                        value = +value;
+                    }
+                }
+                else {
+                    converted_value = "Enter a valid number";
+                }
+
+                var menu_size = menu_items.length;
+                chrome.action.openPopup();
+            }
+        });
     }
+    else {
+        if (info.menuItemId.includes("select")) {
+            selected_id = menu_items.indexOf(info.menuItemId);
 
-    if (info.menuItemId.includes("select")) {
-        selected_id = menu_items.indexOf(info.menuItemId);
+            var conversion_desc_values = Object.values(conversions_descriptions);
+            var conversion_values_arr = Object.values(conversion_values);
 
-        var conversion_desc_values = Object.values(conversions_descriptions);
-        var conversion_values_arr = Object.values(conversion_values);
+            units = conversion_desc_values[selected_id];
 
-        units = conversion_desc_values[selected_id];
+            value = info.selectionText;
 
-        value = info.selectionText;
+            if (isNumeric(value)) {
+                converted_value = +value;
 
-        if (isNumeric(value)) {
-            converted_value = +value;
-
-            if (!isNumeric(converted_value)) {
-                converted_value = "Enter a valid number";
+                if (!isNumeric(converted_value)) {
+                    converted_value = "Enter a valid number";
+                }
+                else {
+                    converted_value = (converted_value / conversion_values_arr[selected_id]).toFixed(3);
+                    value = +value;
+                }
             }
             else {
-                converted_value = (converted_value / conversion_values_arr[selected_id]).toFixed(3);
-                value = +value;
+                converted_value = "Enter a valid number";
             }
-        }
-        else {
-            converted_value = "Enter a valid number";
-        }
 
-        var menu_size = menu_items.length;
-        chrome.action.openPopup();
+            var menu_size = menu_items.length;
+            chrome.action.openPopup();
+        }
     }
+    
 })
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
