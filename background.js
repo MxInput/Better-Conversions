@@ -42,6 +42,7 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
             }
             else {
                 converted_value /= conversion_values_arr[selected_id];
+                value = +value;
             }
         }
         else {

@@ -19,7 +19,8 @@
         border: none;
         background-color: #44bdad;
         color: #FFFFFF;
-        padding: 2px;
+        margin-top: 4px;
+        padding: 8px 16px;
       }
 
       button:hover {
@@ -29,11 +30,16 @@
       #switch {
         display: none;
       }
+
+      #unit_title {
+        display: none;
+      }
     </style>
   </head>
 
   <body>
     <h2>Better Conversions</h2>
+    <h3 id="unit_title">Units of Weight</h3>
     <p id="conversion">Select something to convert.</p>
     
     <div id="switch">
@@ -42,7 +48,7 @@
       <input type="radio" id="option2" name="conversion_option" value="two_story">
       <label for="option2" id="option2_label">2-story buidling</label><br>
 
-      <button onclick="convert"> CONVERT </button>
+      <button id="convert"> CONVERT </button>
     </div>
     <script src="popup.js" type="module"></script>
   </body>

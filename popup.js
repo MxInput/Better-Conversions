@@ -1,8 +1,10 @@
+import { conversion_values, conversions, conversions_descriptions } from './conversion_types.js';
 var original_value;
 
 chrome.runtime.sendMessage({info: 'thing'}, response => {
     var conversion_text = document.getElementById("conversion");
     var switch_div = document.getElementById("switch");
+    var unit_title = document.getElementById("unit_title");
 
     var option1 = document.getElementById("option1");
     var option1_label = document.getElementById("option1_label");
@@ -53,23 +55,49 @@ chrome.runtime.sendMessage({info: 'thing'}, response => {
 });
 
 function convert() {
+    var conversion_desc_keys = Object.values(conversions_descriptions);
+    var conversion_val_values = Object.values(conversion_values);
+    var conversion_text = document.getElementById("conversion");
+
     var option1 = document.getElementById("option1");
     var option2 = document.getElementById("option2");
 
-    if (option1.checked) {
-        if (option1.value == "bananas") {
-            
-        }
-        else if (option1.value == "adult_man") {
+    var index;
 
+    if (original_value != null) {
+        if (option1.checked) {
+            if (option1.value == "bananas") {
+                index = 0;
+                var new_value = original_value / conversion_val_values[index];
+                var desc = conversion_desc_keys[index];
+
+                conversion_text.innerHTML = new_value + desc;
+            }
+            else if (option1.value == "adult_man") {
+                index = 2;
+                var new_value = original_value / conversion_val_values[index];
+                var desc = conversion_desc_keys[index];
+                
+                conversion_text.innerHTML = new_value + desc;
+            }
         }
-    }
-    if (option2.checked) {
-        if (option1.value == "two_story") {
-            
-        }
-        else if (option1.value == "elephants") {
-            
+        if (option2.checked) {
+            if (option2.value == "two_story") {
+                index = 1;
+                var new_value = original_value / conversion_val_values[index];
+                var desc = conversion_desc_keys[index];
+                
+                conversion_text.innerHTML = new_value + desc;
+            }
+            else if (option2.value == "elephants") {
+                index = 3;
+                var new_value = original_value / conversion_val_values[index];
+                var desc = conversion_desc_keys[index];
+                
+                conversion_text.innerHTML = new_value + desc;
+            }
         }
     }
 }
+
+document.getElementById("convert").addEventListener('click', convert);
