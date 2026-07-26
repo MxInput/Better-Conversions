@@ -61,6 +61,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 function processMessage(msg) {
   return new Promise(resolve => {
-    resolve([units, converted_value]);
+    resolve([units, converted_value, value]);
   });
 }
