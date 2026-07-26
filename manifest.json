@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "description": "Converts conventional units of measurement into better ones.",
   "permissions": [
-    "contextMenus"
+    "contextMenus",
+    "storage"
   ],
   "content_scripts": [
     {

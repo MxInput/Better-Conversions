@@ -20,10 +20,15 @@ chrome.runtime.onInstalled.addListener(async () => {
             contexts: ["selection"],
         });
         menu_items.push("select" + conversion_id);
+        localStorage.setItem("menu_items", menu_items);
     }
 });
 
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
+    if (menu_items == undefined || menu_items.length == 0) {
+        menu_items = localStorage.getItem("menu_items");
+    }
+
     if (info.menuItemId.includes("select")) {
         selected_id = menu_items.indexOf(info.menuItemId);
 
@@ -41,7 +46,7 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
                 converted_value = "Enter a valid number";
             }
             else {
-                converted_value /= conversion_values_arr[selected_id];
+                converted_value = (converted_value / conversion_values_arr[selected_id]).toFixed(3);
                 value = +value;
             }
         }
@@ -49,6 +54,7 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
             converted_value = "Enter a valid number";
         }
 
+        var menu_size = menu_items.length;
         chrome.action.openPopup();
     }
 })

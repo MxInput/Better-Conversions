@@ -17,4 +17,4 @@ export const conversion_values = {
     'Feet': 19,
     'Pounds': 177.6,
     'Tons': 6
-}
+};
