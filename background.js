@@ -12,8 +12,7 @@ function isNumeric(num){
 }
 
 async function findMenuItems() {
-    const menu_save_found = await chrome.storage.session.get(["menu_save"]);
-    return menu_save_found;
+    return await chrome.storage.local.get(["menu_save"]);
 }
 
 chrome.runtime.onInstalled.addListener(async () => {
@@ -27,20 +26,19 @@ chrome.runtime.onInstalled.addListener(async () => {
         menu_items.push("select" + conversion_id);
     }
     try {
-        await chrome.storage.session.set({ "menu_save" : menu_items });
-        const result = await chrome.storage.session.get(["menu_save"]);
+        await chrome.storage.local.set({ "menu_save" : menu_items });
     } 
     catch(error) {
         console.log(error);
     }
 });
 
-chrome.contextMenus.onClicked.addListener(function (info, tab) {
+chrome.contextMenus.onClicked.addListener(function (info, tab) {    
     if (menu_items == undefined || menu_items.length == 0) {
-        menu_items = findMenuItems().then(function(result) {
-            var menu_save_found = result.menu_save;
+        findMenuItems().then(function(result) {
+            menu_items = result.menu_save;
             if (info.menuItemId.includes("select")) {
-                selected_id = menu_save_found.indexOf(info.menuItemId);
+                selected_id = menu_items.indexOf(info.menuItemId);
 
                 var conversion_desc_values = Object.values(conversions_descriptions);
                 var conversion_values_arr = Object.values(conversion_values);
@@ -64,7 +62,6 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
                     converted_value = "Enter a valid number";
                 }
 
-                var menu_size = menu_items.length;
                 chrome.action.openPopup();
             }
         });
@@ -95,11 +92,9 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
                 converted_value = "Enter a valid number";
             }
 
-            var menu_size = menu_items.length;
             chrome.action.openPopup();
         }
-    }
-    
+    }   
 })
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
